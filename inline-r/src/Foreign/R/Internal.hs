@@ -55,12 +55,17 @@ sexp = SEXP
 unsexp :: SEXP s -> SEXP0
 unsexp = unSEXP
 
+-- LERegion is used only because LH is confused by (<=)
+type LERegion t s = t <= s
+
+{-@ release :: LERegion t s => a:SEXP s -> TSEXP t (typeOf a) @-}
 -- | Release object into another region. Releasing is safe so long as the target
 -- region is "smaller" than the source region, in the sense of
 -- '(Control.Memory.Region.<=)'.
 release :: (t <= s) => SEXP s -> SEXP t
 release = unsafeRelease
 
+{-@ assume unsafeRelease :: a:SEXP s -> TSEXP r (typeOf a) @-}
 unsafeRelease :: SEXP s -> SEXP r
 unsafeRelease = sexp . unsexp
 
